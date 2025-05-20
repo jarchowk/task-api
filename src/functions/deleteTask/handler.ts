@@ -5,11 +5,11 @@ import { captureLambdaHandler } from "@aws-lambda-powertools/tracer/middleware";
 import { APIGatewayProxyEvent } from "aws-lambda";
 
 import { formatJSONResponse } from "@libs/api-gateway";
-import { deleteTask } from "@libs/services/taskService";
 import { zodPathValidator } from "@libs/middleware/zodPathValidator";
 import { zodErrorHandler } from "@libs/middleware/zodErrorHandler";
 
 import { taskIdSchema } from "@functions/schemas";
+import { deleteTaskController } from "src/tasks/tasksController";
 
 const logger = new Logger({
   persistentLogAttributes: {
@@ -26,7 +26,7 @@ const baseHandler: AWSLambda.Handler = async (event: APIGatewayProxyEvent) => {
   const subsegment = segment.addNewSubsegment("DynamoDB.deleteTask");
 
   try {
-    await deleteTask(taskId);
+    await deleteTaskController(event);
     subsegment.close();
 
     return formatJSONResponse({

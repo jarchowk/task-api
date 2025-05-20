@@ -8,9 +8,9 @@ import { formatJSONResponse } from "@libs/api-gateway";
 import { safeJsonBodyParser } from "@libs/middleware/safeJsonBodyParser";
 import { zodBodyValidator } from "@libs/middleware/zodBodyValidator";
 import { zodErrorHandler } from "@libs/middleware/zodErrorHandler";
-import { updateTask } from "@libs/services/taskService";
 import { zodPathValidator } from "@libs/middleware/zodPathValidator";
 import { taskSchema, taskIdSchema, taskInput } from "@functions/schemas";
+import { updateTaskController } from "src/tasks/tasksController";
 
 const logger = new Logger({
   persistentLogAttributes: {
@@ -24,13 +24,12 @@ const baseHandler: AWSLambda.Handler = async (
   event: APIGatewayProxyEvent & { body: taskInput }
 ) => {
   const taskId = event.pathParameters?.taskId;
-  const { title, description, status } = event.body;
 
   const segment = tracer.getSegment();
   const subsegment = segment.addNewSubsegment("DynamoDB.updateTask");
 
   try {
-    await updateTask(taskId, { title, description, status });
+    await updateTaskController(event);
     subsegment.close();
 
     return formatJSONResponse({

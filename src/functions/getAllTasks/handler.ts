@@ -3,9 +3,7 @@ import { Logger } from "@aws-lambda-powertools/logger";
 import { Tracer } from "@aws-lambda-powertools/tracer";
 import { captureLambdaHandler } from "@aws-lambda-powertools/tracer/middleware";
 import { formatJSONResponse } from "@libs/api-gateway";
-import { getAllTasks } from "@libs/services/taskService";
-import { mapDynamoItemToTask } from "@libs/utils/mapDynamoItemToTask";
-import { Task } from "@functions/types";
+import { getAllTasksController } from "src/tasks/tasksController";
 
 const logger = new Logger({
   persistentLogAttributes: {
@@ -20,9 +18,8 @@ const baseHandler: AWSLambda.Handler = async () => {
   const subsegment = segment.addNewSubsegment("DynamoDB.getAllTasks");
 
   try {
-    const dynamoItems = await getAllTasks();
+    const tasks = await getAllTasksController();
     subsegment.close();
-    const tasks: Task[] = dynamoItems.map(mapDynamoItemToTask);
 
     return formatJSONResponse({
       message: "Tasks retrieved successfully",

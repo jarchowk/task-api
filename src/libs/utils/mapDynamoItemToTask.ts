@@ -1,9 +1,9 @@
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
-import { Task } from "@functions/types";
+import { PersistedTask } from "src/tasks/tasksModel";
 
 export const mapDynamoItemToTask = (
   item: Record<string, AttributeValue>
-): Task => {
+): PersistedTask => {
   if (!item) {
     throw new Error("Item is undefined");
   }
